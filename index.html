@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Versions</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const versionList = document.getElementById("version-list");
+
+            // Fetch version list from versions.json
+            let response = await fetch("versions.json");
+            let versions = await response.json();
+
+            // Sort versions from newest to oldest
+            versions.sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+
+            // Generate HTML list
+            versions.forEach(version => {
+                let versionItem = document.createElement("div");
+                versionItem.classList.add("version-item");
+
+                versionItem.innerHTML = `
+                    <span>${version}</span>
+                    <button class="download-btn" onclick="downloadVersion('${version}')">Download</button>
+                `;
+
+                versionList.appendChild(versionItem);
+            });
+        });
+
+        // Redirects to download the selected version
+        function downloadVersion(version) {
+            window.location.href = `?v=${version}`;
+        }
+
+        // Auto-download if ?v=version is present
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const version = urlParams.get("v");
+            if (version) {
+                window.location.href = `versions/${version}`;
+            }
+        };
+    </script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { width: 50%; margin: auto; }
+        .version-list { display: flex; flex-direction: column; gap: 10px; }
+        .version-item { display: flex; justify-content: space-between; padding: 10px; border: 1px solid #ccc; }
+        .download-btn { background: blue; color: white; padding: 5px 10px; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Available Versions</h2>
+        <div id="version-list" class="version-list"></div>
+    </div>
+</body>
+</html>
