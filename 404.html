@@ -11,7 +11,7 @@
     <script>
         async function handleVersionDownload() {
             let version = window.location.pathname.substring(1); // Extract version from URL
-            if (version.toLowerCase() === "latest") {
+            if (!version || version.toLowerCase() === "latest") {
                 version = "1.0.0"; // Default to 1.0.0 if empty or 'latest'
             }
             window.location.replace(`https://github.com/CelestialDodo/We-re-Smort-Modpack/blob/main/versions/${version}.mrpack`)
