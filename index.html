@@ -5,53 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Versions</title>
     <script>
-        async function autoDownloadVersion() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let version = urlParams.get("v");
+        document.addEventListener("DOMContentLoaded", async function () {
+            let version = window.location.pathname.substring(1); // Extract version from /1.0.0
+            if (!version) return; // If no version is specified, do nothing
         
-            if (!version) return; // No version specified, do nothing
+            // Handle old "?v=..." format by redirecting to "/version"
+            let params = new URLSearchParams(window.location.search);
+            if (params.has("v")) {
+                let newVersion = params.get("v");
+                window.location.href = `/${newVersion}`;
+                return;
+            }
         
             try {
-                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json");
-                if (!response.ok) throw new Error("Failed to fetch versions.json");
+                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
+                if (!response.ok) throw new Error("Failed to load versions.json");
         
                 let versions = await response.json();
-                if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+                let matchingVersion = versions.find(v => v.version === version) || versions[0]; // Default to latest
         
-                // Sort versions from newest to oldest
-                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
-        
-                // If "latest" is requested, set version to the newest version
-                if (version.toLowerCase() === "latest") {
-                    version = versions[0].version; // The first item is the latest version
-                }
-        
-                // Find the correct version in the list
-                let matchingVersion = versions.find(v => v.version === version);
-                if (matchingVersion) {
-                    // Force direct download instead of redirecting
-                    let link = document.createElement("a");
-                
-                    // Force .zip extension by replacing .mrpack in the URL
-                    let zipUrl = matchingVersion.fileUrl.replace(/\.mrpack$/, ".zip");
-                    
-                    link.href = zipUrl;
-                    link.download = `Were-Smort-${matchingVersion.version}.zip`;
-                    alert(link.download);
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                } else {
+                if (!matchingVersion) {
                     alert("Version not found!");
+                    return;
                 }
-            } catch (error) {
-                console.error("Error fetching versions.json:", error);
-                alert("Failed to load versions. Please try again later.");
-            }
-        }
         
-        // Run this when the page loads
-        autoDownloadVersion();
+                let link = document.createElement("a");
+                link.href = matchingVersion.fileUrl;
+                link.download = `Were-Smort-${matchingVersion.version}.zip`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error("Error loading versions:", error);
+            }
+        });
         
         async function fetchVersions() {
             try {
