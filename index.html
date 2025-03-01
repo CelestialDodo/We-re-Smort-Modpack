@@ -6,38 +6,44 @@
     <title>Download Versions</title>
     <script>
         async function fetchVersions() {
-        try {
-            let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json");
-            if (!response.ok) throw new Error("Failed to load versions.json");
-
-            let versions = await response.json();
-            console.log("Loaded versions.json:", versions);
-
-            // Display raw JSON data for debugging
-            document.getElementById("json-debug").innerText = JSON.stringify(versions, null, 2);
-
-            if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
-
-            versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
-
-            let container = document.getElementById("version-list");
-            container.innerHTML = "";
-
-            versions.forEach(version => {
-                if (!version.version || !version.fileUrl) {
-                    console.warn("Skipping invalid version entry:", version);
-                    return;
-                }
-
-                let row = document.createElement("div");
-                row.innerHTML = `
-                    <span>${version.version}</span>
-                    <button onclick="window.location.href='${version.fileUrl}'">Download</button>
-                `;
-                container.appendChild(row);
-            });
-
-    window.onload = fetchVersions;
+            try {
+                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
+                if (!response.ok) throw new Error("Failed to load versions.json");
+    
+                let versions = await response.json();
+                console.log("Loaded versions.json:", versions);
+    
+                // Display raw JSON data for debugging
+                document.getElementById("json-debug").innerText = JSON.stringify(versions, null, 2);
+    
+                if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+    
+                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
+    
+                let container = document.getElementById("version-list");
+                container.innerHTML = "";
+    
+                versions.forEach(version => {
+                    if (!version.version || !version.fileUrl) {
+                        console.warn("Skipping invalid version entry:", version);
+                        return;
+                    }
+    
+                    let row = document.createElement("div");
+                    row.innerHTML = `
+                        <span>${version.version}</span>
+                        <button onclick="window.location.href='${version.fileUrl}'">Download</button>
+                    `;
+                    container.appendChild(row);
+                });
+    
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById("json-debug").innerText = "Failed to load versions.json";
+            }
+        }
+    
+        window.onload = fetchVersions;
     </script>
 </head>
 <body>
