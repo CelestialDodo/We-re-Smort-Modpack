@@ -6,54 +6,49 @@
     <title>Download Versions</title>
     <script>
         async function fetchVersions() {
-            try {
-                let response = await fetch("versions.json");
-                if (!response.ok) throw new Error("Failed to load versions.json");
+        try {
+            let response = await fetch("versions.json");
+            if (!response.ok) throw new Error("Failed to load versions.json");
 
-                let versions = await response.json();
+            let versions = await response.json();
+            console.log("Loaded versions.json:", versions);
 
-                if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+            // Display raw JSON data for debugging
+            document.getElementById("json-debug").innerText = JSON.stringify(versions, null, 2);
 
-                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
+            if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
 
-                let container = document.getElementById("version-list");
-                container.innerHTML = "";
+            versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
 
-                versions.forEach(version => {
-                    if (!version.version || !version.fileUrl) {
-                        console.warn("Skipping invalid version entry:", version);
-                        return;
-                    }
+            let container = document.getElementById("version-list");
+            container.innerHTML = "";
 
-                    let row = document.createElement("div");
-                    row.innerHTML = `
-                        <span>${version.version}</span>
-                        <button onclick="window.location.href='${version.fileUrl}'">Download</button>
-                    `;
-                    container.appendChild(row);
-                });
-
-                // Auto-download if ?v=version is present
-                let urlParams = new URLSearchParams(window.location.search);
-                let requestedVersion = urlParams.get("v");
-                if (requestedVersion) {
-                    let matchedVersion = versions.find(v => v.version === requestedVersion);
-                    if (matchedVersion) {
-                        window.location.href = matchedVersion.fileUrl;
-                    } else {
-                        console.error("Version not found:", requestedVersion);
-                    }
+            versions.forEach(version => {
+                if (!version.version || !version.fileUrl) {
+                    console.warn("Skipping invalid version entry:", version);
+                    return;
                 }
+
+                let row = document.createElement("div");
+                row.innerHTML = `
+                    <span>${version.version}</span>
+                    <button onclick="window.location.href='${version.fileUrl}'">Download</button>
+                `;
+                container.appendChild(row);
+            });
             } catch (error) {
                 console.error("Error loading versions:", error);
-                document.getElementById("version-list").innerHTML = "<p style='color:red;'>Failed to load versions.</p>";
+                document.getElementById("json-debug").innerText = "Failed to load versions.json";
             }
         }
-
+    
         window.onload = fetchVersions;
     </script>
 </head>
 <body>
+    <h2>Debug: versions.json</h2>
+    <pre id="json-debug">Loading...</pre>
+
     <h1>Available Versions</h1>
     <div id="version-list"></div>
 </body>
