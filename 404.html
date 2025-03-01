@@ -11,22 +11,7 @@
     <script>
         async function handleVersionDownload() {
             let version = window.location.pathname.substring(1); // Extract version from URL
-
-            let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
-            if (!response.ok) {
-                document.body.innerHTML = "<h1>Failed to load versions.json</h1>";
-                return;
-            }
-
-            let versions = await response.json();
-            let matchingVersion = versions.find(v => v.version === version) || versions[0]; // Default to latest if not found
-
-            if (!matchingVersion) {
-                document.body.innerHTML = "<h1>Version not found!</h1>";
-                return;
-            }
-
-            window.location.href = matchingVersion.fileUrl; // Redirect to download
+            window.location.href = `https://github.com/CelestialDodo/We-re-Smort-Modpack/raw/refs/heads/main/versions/${version}.mrpack`
         }
 
         handleVersionDownload();
