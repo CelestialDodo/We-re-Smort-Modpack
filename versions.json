@@ -1,4 +1,6 @@
-// versions.json
 [
-    "We're Smort 1.0.0.zip"
+    {
+        "name": "We're Smort 1.0.0",
+        "id": "1yVLJqb1Rnx72vttex0f4nIaZMIkeK1FX"
+    }
 ]
