@@ -3,93 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Versions</title>
-    <script>
-        document.addEventListener("DOMContentLoaded", async function () {
-            let version = window.location.pathname.substring(1); // Extract version from /1.0.0
-            if (!version) return; // If no version is specified, do nothing
-        
-            // Handle old "?v=..." format by redirecting to "/version"
-            let params = new URLSearchParams(window.location.search);
-            if (params.has("v")) {
-                let newVersion = params.get("v");
-                window.location.href = `/${newVersion}`;
-                return;
-            }
-        
-            try {
-                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
-                if (!response.ok) throw new Error("Failed to load versions.json");
-        
-                let versions = await response.json();
-                let matchingVersion = versions.find(v => v.version === version) || versions[0]; // Default to latest
-        
-                if (!matchingVersion) {
-                    alert("Version not found!");
-                    return;
-                }
-        
-                let link = document.createElement("a");
-                link.href = matchingVersion.fileUrl;
-                link.download = `Were-Smort-${matchingVersion.version}.zip`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } catch (error) {
-                console.error("Error loading versions:", error);
-            }
-        });
-        
-        async function fetchVersions() {
-            try {
-                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
-                if (!response.ok) throw new Error("Failed to load versions.json");
-        
-                let versions = await response.json();
-                console.log("Loaded versions.json:", versions);
-        
-                let container = document.getElementById("version-list");
-                if (!container) throw new Error("version-list element not found in HTML");
-        
-                container.innerHTML = "";
-        
-                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
-        
-                versions.forEach(version => {
-                    if (!version.version || !version.fileUrl) {
-                        console.warn("Skipping invalid version entry:", version);
-                        return;
-                    }
-        
-                    // Fix Dropbox link by replacing ?dl=0 with ?dl=1
-                    let directDownloadUrl = version.fileUrl.replace("?dl=0", "?dl=1");
-        
-                    let row = document.createElement("div");
-
-                    let versionText = document.createElement("span");
-                    versionText.textContent = version.version;
-                    
-                    let downloadButton = document.createElement("button");
-                    downloadButton.textContent = "Download";
-                    downloadButton.onclick = () => {
-                        window.location.href = `?v=${version.version}`;
-                    };
-                    
-                    row.appendChild(versionText);
-                    row.appendChild(downloadButton);
-                    container.appendChild(row);
-                });
-        
-            } catch (error) {
-                console.error("Error:", error);
-            }
-        }
-        
-        window.onload = fetchVersions;
-    </script>
+    <title>We're Smort, Downloads</title>
 </head>
 <body>
     <h1>Available Versions</h1>
     <div id="version-list"></div>
+
+    <script>
+        async function fetchVersions() {
+            let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
+            if (!response.ok) throw new Error("Failed to load versions.json");
+
+            let versions = await response.json();
+            let container = document.getElementById("version-list");
+
+            versions.forEach(version => {
+                let row = document.createElement("div");
+                row.innerHTML = `
+                    <span>${version.version}</span>
+                    <button onclick="window.location.href='/${version.version}'">Download</button>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        fetchVersions();
+    </script>
 </body>
 </html>
