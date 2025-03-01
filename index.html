@@ -7,7 +7,7 @@
     <script>
         async function fetchVersions() {
         try {
-            let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json");
+            let response = await fetch("versions.json");
             if (!response.ok) throw new Error("Failed to load versions.json");
 
             let versions = await response.json();
@@ -36,13 +36,13 @@
                 `;
                 container.appendChild(row);
             });
-            } catch (error) {
-                console.error("Error loading versions:", error);
-                document.getElementById("json-debug").innerText = "Failed to load versions.json";
-            }
+        } catch (error) {
+            console.error("Error loading versions:", error);
+            document.getElementById("json-debug").innerText = "Failed to load versions.json";
         }
-    
-        window.onload = fetchVersions;
+    }
+
+    window.onload = fetchVersions;
     </script>
 </head>
 <body>
