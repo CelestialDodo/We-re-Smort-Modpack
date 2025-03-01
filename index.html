@@ -13,9 +13,6 @@
                 let versions = await response.json();
                 console.log("Loaded versions.json:", versions);
     
-                // Display raw JSON data for debugging
-                document.getElementById("json-debug").innerText = JSON.stringify(versions, null, 2);
-    
                 if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
     
                 versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
@@ -39,7 +36,6 @@
     
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById("json-debug").innerText = "Failed to load versions.json";
             }
         }
     
