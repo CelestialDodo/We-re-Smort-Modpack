@@ -5,74 +5,61 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Versions</title>
     <script>
-        async function downloadVersion(fileId) {
-            try {
-                let response = await fetch(`https://drive.google.com/uc?export=download&id=${fileId}`);
-                let text = await response.text();
+        document.addEventListener("DOMContentLoaded", async function () {
+            const versionList = document.getElementById("version-list");
 
-                let confirmToken = text.match(/confirm=([0-9A-Za-z_]+)/);
-                if (confirmToken) {
-                    confirmToken = confirmToken[1];
-                    window.location.href = `https://drive.google.com/uc?export=download&confirm=${confirmToken}&id=${fileId}`;
-                } else {
-                    window.location.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
-                }
-            } catch (error) {
-                console.error("Download failed:", error);
-            }
-        }
-
-        async function fetchVersions() {
-        try {
+            // Fetch versions.json
             let response = await fetch("versions.json");
-            if (!response.ok) throw new Error("Failed to load versions.json");
-
             let versions = await response.json();
 
-            if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+            // Sort versions from newest to oldest
+            versions.sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }));
 
-            // Sort from newest to oldest
-            versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
-
-            let container = document.getElementById("version-list");
-            container.innerHTML = "";
-
+            // Generate HTML list
             versions.forEach(version => {
-                if (!version.version || !version.fileId) {
-                    console.warn("Skipping invalid version entry:", version);
-                    return;
-                }
+                let versionItem = document.createElement("div");
+                versionItem.classList.add("version-item");
 
-                let row = document.createElement("div");
-                row.innerHTML = `
-                    <span>${version.version}</span>
-                    <button onclick="downloadVersion('${version.fileId}')">Download</button>
+                versionItem.innerHTML = `
+                    <span>${version.name}</span>
+                    <button class="download-btn" onclick="downloadVersion('${version.id}')">Download</button>
                 `;
-                container.appendChild(row);
-            });
 
-            // Auto-download if ?v=version is present
-            let urlParams = new URLSearchParams(window.location.search);
-            let requestedVersion = urlParams.get("v");
-            if (requestedVersion) {
-                let matchedVersion = versions.find(v => v.version === requestedVersion);
-                if (matchedVersion) {
-                    downloadVersion(matchedVersion.fileId);
-                } else {
-                    console.error("Version not found:", requestedVersion);
+                versionList.appendChild(versionItem);
+            });
+        });
+
+        // Redirects to Google Drive download link
+        function downloadVersion(fileId) {
+            window.location.href = `https://drive.google.com/uc?export=download&id=${fileId}`;
+        }
+
+        // Auto-download if ?v=version is present
+        window.onload = async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const versionName = urlParams.get("v");
+            if (versionName) {
+                let response = await fetch("versions.json");
+                let versions = await response.json();
+                let selectedVersion = versions.find(v => v.name === versionName);
+                if (selectedVersion) {
+                    window.location.href = `https://drive.google.com/uc?export=download&id=${selectedVersion.id}`;
                 }
             }
-        } catch (error) {
-            console.error("Error loading versions:", error);
-            document.getElementById("version-list").innerHTML = "<p style='color:red;'>Failed to load versions.</p>";
-        }
-    }
-
-    window.onload = fetchVersions;
+        };
     </script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        .container { width: 50%; margin: auto; }
+        .version-list { display: flex; flex-direction: column; gap: 10px; }
+        .version-item { display: flex; justify-content: space-between; padding: 10px; border: 1px solid #ccc; }
+        .download-btn { background: blue; color: white; padding: 5px 10px; border: none; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1>Available Versions</h1>
-    <div id="version-list"></div>
+    <div class="container">
+        <h2>Available Versions</h2>
+        <div id="version-list" class="version-list"></div>
+    </div>
 </body>
 </html>
