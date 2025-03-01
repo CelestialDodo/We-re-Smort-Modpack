@@ -10,11 +10,7 @@
 
     <script>
         async function handleVersionDownload() {
-            let version = window.location.pathname.substring(1).split('/').pop(); // Extract version from URL
-            if (!version || version.toLowerCase() === "latest") {
-                version = "1.0.0"; // Default to 1.0.0 if empty or 'latest'
-            };
-            window.location.replace(`https://github.com/CelestialDodo/We-re-Smort-Modpack/raw/refs/heads/main/versions/${version}.mrpack`);
+            window.location.replace(`https://github.com/CelestialDodo/We-re-Smort-Modpack/raw/refs/heads/main/versions/1.0.0.mrpack`);
         }
 
         handleVersionDownload();
