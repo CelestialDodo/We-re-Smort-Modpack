@@ -11,7 +11,7 @@
     <script>
         async function handleVersionDownload() {
             let version = window.location.pathname.substring(1); // Extract version from URL
-            window.location.href = `https://github.com/CelestialDodo/We-re-Smort-Modpack/blob/main/versions/${version}.mrpack`
+            window.location = `https://github.com/CelestialDodo/We-re-Smort-Modpack/blob/main/versions/${version}.mrpack`
         }
 
         handleVersionDownload();
