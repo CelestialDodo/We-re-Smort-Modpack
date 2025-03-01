@@ -32,7 +32,7 @@
                     // Force direct download instead of redirecting
                     let link = document.createElement("a");
                     link.href = matchingVersion.fileUrl;
-                    link.download = "Were-Smort-${version}.zip"; // matchingVersion.fileUrl.split("/").pop(); // Extract filename from URL
+                    link.download = 'Were-Smort-${version}.zip'; // matchingVersion.fileUrl.split("/").pop(); // Extract filename from URL
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
