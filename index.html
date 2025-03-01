@@ -18,7 +18,7 @@
                 let versions = await response.json();
                 if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
         
-                // Sort versions from newest to oldest (assuming versions are named correctly)
+                // Sort versions from newest to oldest
                 versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
         
                 // If "latest" is requested, set version to the newest version
@@ -29,7 +29,13 @@
                 // Find the correct version in the list
                 let matchingVersion = versions.find(v => v.version === version);
                 if (matchingVersion) {
-                    window.location.href = matchingVersion.fileUrl; // Redirect to the file download link
+                    // Force direct download instead of redirecting
+                    let link = document.createElement("a");
+                    link.href = matchingVersion.fileUrl;
+                    link.download = matchingVersion.fileUrl.split("/").pop(); // Extract filename from URL
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 } else {
                     alert("Version not found!");
                 }
