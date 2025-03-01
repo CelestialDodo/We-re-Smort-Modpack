@@ -5,23 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Versions</title>
     <script>
-        function autoDownloadVersion() {
+        async function autoDownloadVersion() {
             const urlParams = new URLSearchParams(window.location.search);
-            const version = urlParams.get("v");
+            let version = urlParams.get("v");
         
             if (!version) return; // No version specified, do nothing
         
-            fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json")
-                .then(response => response.json())
-                .then(versions => {
-                    let matchingVersion = versions.find(v => v.version === version);
-                    if (matchingVersion) {
-                        window.location.href = matchingVersion.fileUrl; // Start download
-                    } else {
-                        alert("Version not found!");
-                    }
-                })
-                .catch(error => console.error("Error fetching versions.json:", error));
+            try {
+                let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json");
+                if (!response.ok) throw new Error("Failed to fetch versions.json");
+        
+                let versions = await response.json();
+                if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+        
+                // Sort versions from newest to oldest (assuming versions are named correctly)
+                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
+        
+                // If "latest" is requested, set version to the newest version
+                if (version.toLowerCase() === "latest") {
+                    version = versions[0].version; // The first item is the latest version
+                }
+        
+                // Find the correct version in the list
+                let matchingVersion = versions.find(v => v.version === version);
+                if (matchingVersion) {
+                    window.location.href = matchingVersion.fileUrl; // Redirect to the file download link
+                } else {
+                    alert("Version not found!");
+                }
+            } catch (error) {
+                console.error("Error fetching versions.json:", error);
+                alert("Failed to load versions. Please try again later.");
+            }
         }
         
         // Run this when the page loads
