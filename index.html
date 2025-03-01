@@ -7,7 +7,7 @@
     <script>
         async function fetchVersions() {
         try {
-            let response = await fetch("versions.json");
+            let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json");
             if (!response.ok) throw new Error("Failed to load versions.json");
 
             let versions = await response.json();
