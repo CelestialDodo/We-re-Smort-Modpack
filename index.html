@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Download Versions</title>
     <script>
+        function autoDownloadVersion() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const version = urlParams.get("v");
+        
+            if (!version) return; // No version specified, do nothing
+        
+            fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/refs/heads/main/versions.json")
+                .then(response => response.json())
+                .then(versions => {
+                    let matchingVersion = versions.find(v => v.version === version);
+                    if (matchingVersion) {
+                        window.location.href = matchingVersion.fileUrl; // Start download
+                    } else {
+                        alert("Version not found!");
+                    }
+                })
+                .catch(error => console.error("Error fetching versions.json:", error));
+        }
+        
+        // Run this when the page loads
+        autoDownloadVersion();
+        
         async function fetchVersions() {
             try {
                 let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
@@ -36,7 +58,9 @@
                     
                     let downloadButton = document.createElement("button");
                     downloadButton.textContent = "Download";
-                    downloadButton.onclick = () => window.location.href = directDownloadUrl;
+                    downloadButton.onclick = () => {
+                        window.location.href = `?v=${version.version}`;
+                    };
                     
                     row.appendChild(versionText);
                     row.appendChild(downloadButton);
