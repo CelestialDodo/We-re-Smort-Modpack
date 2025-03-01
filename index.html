@@ -32,7 +32,7 @@
                     let row = document.createElement("div");
                     row.innerHTML = `
                         <span>${version.version}</span>
-                        <button onclick="window.location.href='${directDownloadUrl}'">Download</button>
+                        <button onclick="window.location.href=\"${directDownloadUrl}\"">Download</button>
                     `;
                     container.appendChild(row);
                 });
