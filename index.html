@@ -31,8 +31,12 @@
                 if (matchingVersion) {
                     // Force direct download instead of redirecting
                     let link = document.createElement("a");
-                    link.href = matchingVersion.fileUrl;
-                    link.download = `Were-Smort-${matchingVersion.version}.zip`; // Corrected template literal
+                
+                    // Force .zip extension by replacing .mrpack in the URL
+                    let zipUrl = matchingVersion.fileUrl.replace(/\.mrpack$/, ".zip");
+                    
+                    link.href = zipUrl;
+                    link.download = `Were-Smort-${matchingVersion.version}.zip`;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
