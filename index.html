@@ -23,15 +23,26 @@
         }
 
         async function fetchVersions() {
+        try {
             let response = await fetch("versions.json");
+            if (!response.ok) throw new Error("Failed to load versions.json");
+
             let versions = await response.json();
 
-            versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true })); // Sort from newest to oldest
+            if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
+
+            // Sort from newest to oldest
+            versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
 
             let container = document.getElementById("version-list");
             container.innerHTML = "";
 
             versions.forEach(version => {
+                if (!version.version || !version.fileId) {
+                    console.warn("Skipping invalid version entry:", version);
+                    return;
+                }
+
                 let row = document.createElement("div");
                 row.innerHTML = `
                     <span>${version.version}</span>
@@ -47,11 +58,17 @@
                 let matchedVersion = versions.find(v => v.version === requestedVersion);
                 if (matchedVersion) {
                     downloadVersion(matchedVersion.fileId);
+                } else {
+                    console.error("Version not found:", requestedVersion);
                 }
             }
+        } catch (error) {
+            console.error("Error loading versions:", error);
+            document.getElementById("version-list").innerHTML = "<p style='color:red;'>Failed to load versions.</p>";
         }
+    }
 
-        window.onload = fetchVersions;
+    window.onload = fetchVersions;
     </script>
 </head>
 <body>
