@@ -9,36 +9,39 @@
             try {
                 let response = await fetch("https://raw.githubusercontent.com/CelestialDodo/We-re-Smort-Modpack/main/versions.json");
                 if (!response.ok) throw new Error("Failed to load versions.json");
-    
+        
                 let versions = await response.json();
                 console.log("Loaded versions.json:", versions);
-    
-                if (!Array.isArray(versions) || versions.length === 0) throw new Error("Invalid versions.json format");
-    
-                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
-    
+        
                 let container = document.getElementById("version-list");
+                if (!container) throw new Error("version-list element not found in HTML");
+        
                 container.innerHTML = "";
-    
+        
+                versions.sort((a, b) => b.version.localeCompare(a.version, undefined, { numeric: true }));
+        
                 versions.forEach(version => {
                     if (!version.version || !version.fileUrl) {
                         console.warn("Skipping invalid version entry:", version);
                         return;
                     }
-    
+        
+                    // Fix Dropbox link by replacing ?dl=0 with ?dl=1
+                    let directDownloadUrl = version.fileUrl.replace("?dl=0", "?dl=1");
+        
                     let row = document.createElement("div");
                     row.innerHTML = `
                         <span>${version.version}</span>
-                        <button onclick="window.location.href='${version.fileUrl}'">Download</button>
+                        <button onclick="window.location.href='${directDownloadUrl}'">Download</button>
                     `;
                     container.appendChild(row);
                 });
-    
+        
             } catch (error) {
                 console.error("Error:", error);
             }
         }
-    
+        
         window.onload = fetchVersions;
     </script>
 </head>
