@@ -36,10 +36,6 @@
                 `;
                 container.appendChild(row);
             });
-        } catch (error) {
-            console.error("Error loading versions:", error);
-            document.getElementById("json-debug").innerText = "Failed to load versions.json";
-        }
     }
 
     window.onload = fetchVersions;
